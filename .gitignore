@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[oc]
+*.egg-info
+build/
+dist/
+wheels/
+.venv/
+.python-version
+
+# Environment
+.env
+
+# Vercel
+.vercel/
+
+# Per-paper cache (rebuilt on demand)
+cache/
+
+# pyvis output (regenerated per request; not needed in git)
+static/graph.html
+
+# Vite / Node
+frontend/node_modules/
+frontend/dist/
+
+# OS
+.DS_Store

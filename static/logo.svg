@@ -1,0 +1,65 @@
+<svg width="500" height="250" viewBox="0 0 500 250" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Citation Navigator</title>
+  <desc>Citation Navigator logo — open book with compass on the right page</desc>
+
+  <!-- Left page -->
+  <path d="M40 28 L40 172 Q40 184 52 184 L106 172 L106 28 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.2"/>
+
+  <!-- Right page -->
+  <path d="M184 28 L184 172 Q184 184 172 184 L118 172 L118 28 Z" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.2"/>
+
+  <!-- Spine -->
+  <line x1="106" y1="28" x2="118" y2="28" stroke="#94a3b8" stroke-width="1.2"/>
+  <line x1="106" y1="184" x2="118" y2="184" stroke="#94a3b8" stroke-width="1.2"/>
+
+  <!-- Bottom curve -->
+  <path d="M40 172 Q40 192 73 198 Q112 205 151 198 Q184 192 184 172" fill="none" stroke="#94a3b8" stroke-width="1.2"/>
+
+  <!-- Left page text lines -->
+  <line x1="52" y1="54"  x2="95" y2="54"  stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <line x1="52" y1="68"  x2="92" y2="68"  stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <line x1="52" y1="82"  x2="96" y2="82"  stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <line x1="52" y1="96"  x2="90" y2="96"  stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <line x1="52" y1="110" x2="95" y2="110" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <line x1="52" y1="124" x2="88" y2="124" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <line x1="52" y1="138" x2="94" y2="138" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Compass circle -->
+  <circle cx="151" cy="101" r="38" fill="white" stroke="#bfdbfe" stroke-width="1.5"/>
+
+  <!-- Compass ticks -->
+  <g stroke="#bfdbfe" stroke-width="1">
+    <line x1="151" y1="64"  x2="151" y2="70"/>
+    <line x1="151" y1="132" x2="151" y2="138"/>
+    <line x1="113" y1="101" x2="119" y2="101"/>
+    <line x1="183" y1="101" x2="189" y2="101"/>
+    <line x1="124" y1="74"  x2="127" y2="78"/>
+    <line x1="175" y1="124" x2="178" y2="128"/>
+    <line x1="178" y1="74"  x2="175" y2="78"/>
+    <line x1="127" y1="124" x2="124" y2="128"/>
+  </g>
+
+  <!-- Crosshairs -->
+  <line x1="151" y1="71" x2="151" y2="131" stroke="#dbeafe" stroke-width="1"/>
+  <line x1="121" y1="101" x2="181" y2="101" stroke="#dbeafe" stroke-width="1"/>
+
+  <!-- Cardinal labels -->
+  <text x="151" y="81"  text-anchor="middle" font-family="-apple-system,Arial,sans-serif" font-size="9" font-weight="700" fill="#93c5fd">N</text>
+  <text x="151" y="129" text-anchor="middle" font-family="-apple-system,Arial,sans-serif" font-size="9" font-weight="700" fill="#93c5fd">S</text>
+  <text x="180" y="105" text-anchor="middle" font-family="-apple-system,Arial,sans-serif" font-size="9" font-weight="700" fill="#93c5fd">E</text>
+  <text x="122" y="105" text-anchor="middle" font-family="-apple-system,Arial,sans-serif" font-size="9" font-weight="700" fill="#93c5fd">W</text>
+
+  <!-- Needle -->
+  <polygon points="151,76 147,101 151,105 155,101" fill="#2563eb"/>
+  <polygon points="151,126 147,101 151,105 155,101" fill="#94a3b8"/>
+  <circle cx="151" cy="101" r="5" fill="white" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="151" cy="101" r="2" fill="#1e40af"/>
+
+  <!-- Wordmark -->
+  <text x="210" y="104" font-family="-apple-system,'Segoe UI',Arial,sans-serif" font-size="36" font-weight="700" fill="#0f172a">Citation</text>
+  <text x="210" y="144" font-family="-apple-system,'Segoe UI',Arial,sans-serif" font-size="36" font-weight="300" fill="#2563eb">Navigator</text>
+  <text x="212" y="172" font-family="-apple-system,'Segoe UI',Arial,sans-serif" font-size="12" font-weight="400" fill="#64748b" letter-spacing="2.5">ACADEMIC REFERENCE TOOL</text>
+
+  <!-- Thin rule -->
+  <line x1="40" y1="204" x2="184" y2="204" stroke="#e2e8f0" stroke-width="0.8"/>
+</svg>

@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "static/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/static/assets/$1"
+    },
+    {
+      "src": "/ask",
+      "dest": "/main.py"
+    },
+    {
+      "src": "/graph",
+      "dest": "/main.py"
+    },
+    {
+      "src": "/static/graph.html",
+      "dest": "/main.py"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/static/index.html"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-cream dark:bg-dusk-900;
+  }
+  body {
+    @apply bg-cream text-bark antialiased dark:bg-dusk-900 dark:text-dusk-100;
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.3s ease both;
+}
+
+/* Graph iframe embedded inline in ResultCard */
+.graph-frame {
+  display: block;
+  width: 100%;
+  height: 520px;
+  border: none;
+}

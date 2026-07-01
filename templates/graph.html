@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Citation Navigator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"
+        crossorigin="anonymous"></script>
+<link  href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css"
+       rel="stylesheet" crossorigin="anonymous">
+<style>
+/* ── theme tokens ── */
+:root {
+  --bg:           #0d1117;
+  --surface:      #161b22;
+  --surface2:     #0d1117;
+  --border:       #30363d;
+  --border2:      #21262d;
+  --text1:        #e6edf3;
+  --text2:        #8b949e;
+  --text3:        #6e7681;
+  --link:         #58a6ff;
+  --badge-root-bg:#1a1060;
+  --badge-root-fg:#c084fc;
+  --badge-cite-bg:#0d2010;
+  --badge-cite-fg:#4ade80;
+  --legend-bg:    rgba(22,27,34,.92);
+  --tooltip-bg:   #161b22;
+  --tooltip-bdr:  #30363d;
+}
+[data-theme="light"] {
+  --bg:           #f1f5f9;
+  --surface:      #ffffff;
+  --surface2:     #f8fafc;
+  --border:       #e2e8f0;
+  --border2:      #e2e8f0;
+  --text1:        #0f172a;
+  --text2:        #475569;
+  --text3:        #94a3b8;
+  --link:         #0369a1;
+  --badge-root-bg:#ede9fe;
+  --badge-root-fg:#7c3aed;
+  --badge-cite-bg:#dcfce7;
+  --badge-cite-fg:#16a34a;
+  --legend-bg:    rgba(248,250,252,.95);
+  --tooltip-bg:   #ffffff;
+  --tooltip-bdr:  #e2e8f0;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  transition:background .3s
+}
+#graph{width:100%;height:100%}
+
+.vis-tooltip{
+  background:var(--tooltip-bg) !important;
+  border:1px solid var(--tooltip-bdr) !important;
+  border-radius:8px !important;padding:0 !important;
+  box-shadow:0 8px 28px rgba(0,0,0,.35) !important;
+  font-family:-apple-system,sans-serif !important;
+  max-width:280px !important;pointer-events:none
+}
+.tt{padding:10px 13px;max-width:270px}
+.tt-title{font-size:12px;color:var(--text1);display:block;margin-bottom:4px}
+.tt-meta{font-size:11px;color:var(--text2)}
+.tt-meta2{font-size:11px;color:var(--text3)}
+.tt-abstract{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+
+/* ── corner icon buttons (help / fit-to-view) ── */
+#corner-controls{
+  position:fixed;bottom:16px;left:16px;z-index:100;
+  display:flex;flex-direction:column;gap:8px
+}
+.icon-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text2);font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  transition:background .3s,border-color .3s,color .2s
+}
+.icon-btn:hover{color:var(--text1)}
+
+/* ── side panel ── */
+#panel{
+  position:fixed;top:0;right:-380px;width:360px;height:100%;
+  background:var(--surface);border-left:1px solid var(--border);
+  padding:20px 18px;overflow-y:auto;
+  transition:right .28s cubic-bezier(.4,0,.2,1),background .3s,border-color .3s;
+  z-index:100;display:flex;flex-direction:column;gap:14px
+}
+#panel.open{right:0}
+#panel-close{
+  position:absolute;top:14px;right:14px;
+  background:none;border:none;color:var(--text2);
+  font-size:20px;cursor:pointer;line-height:1;transition:color .2s
+}
+#panel-close:hover{color:var(--text1)}
+#panel-badge{
+  display:inline-block;font-size:10px;font-weight:700;
+  padding:2px 9px;border-radius:10px;letter-spacing:.07em;
+  transition:background .3s,color .3s
+}
+#panel-year-tag{font-size:12px;color:var(--text2)}
+#panel-title{font-size:15px;font-weight:600;color:var(--text1);line-height:1.45}
+#panel-authors{font-size:12px;color:var(--text2);line-height:1.4}
+#panel-stats{
+  display:flex;gap:16px;font-size:12px;
+  background:var(--surface2);border-radius:6px;padding:10px 12px;transition:background .3s
+}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat-val{font-size:17px;font-weight:600;color:var(--text1)}
+.stat-lbl{color:var(--text3)}
+#panel-divider{border:none;border-top:1px solid var(--border2)}
+#panel-abstract{font-size:12px;color:var(--text2);line-height:1.65}
+#panel-link{display:inline-block;font-size:12px;color:var(--link);text-decoration:none}
+#panel-link:hover{text-decoration:underline}
+
+/* ── legend ── */
+#legend{
+  position:fixed;bottom:16px;right:16px;z-index:100;
+  background:var(--legend-bg);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;font-size:11px;color:var(--text2);
+  pointer-events:none;transition:background .3s,border-color .3s
+}
+#legend-title{
+  font-size:10px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;margin-bottom:7px;color:var(--text3)
+}
+#legend-bar{
+  width:160px;height:7px;border-radius:4px;margin-bottom:5px;
+  background:linear-gradient(to right,#b0c4bf,#0a3d3d)
+}
+#legend-labels{display:flex;justify-content:space-between;width:160px;color:var(--text3)}
+
+/* ── toggle button ── */
+#theme-btn{
+  position:fixed;top:16px;right:16px;z-index:200;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  transition:background .3s,border-color .3s,color .2s;
+  box-shadow:0 2px 8px rgba(0,0,0,.2)
+}
+#theme-btn:hover{color:var(--text1)}
+</style>
+</head>
+<body>
+
+<div id="graph"></div>
+
+<button id="theme-btn" onclick="toggleTheme()">
+  <span id="theme-icon">&#9789;</span>
+  <span id="theme-label">Dark</span>
+</button>
+
+<div id="corner-controls">
+  <button class="icon-btn" onclick="network.fit({animation:{duration:400,easing:'easeInOutQuad'}})" title="Fit graph to view">&#x2316;</button>
+  <button class="icon-btn" title="Hover a paper to preview it · Click for details · Drag to rearrange">?</button>
+</div>
+
+<div id="panel">
+  <button id="panel-close" onclick="closePanel()">&#x2715;</button>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <span id="panel-badge"></span>
+    <span id="panel-year-tag"></span>
+  </div>
+  <div id="panel-title"></div>
+  <div id="panel-authors"></div>
+  <div id="panel-stats">
+    <div class="stat">
+      <span class="stat-val" id="stat-citations">&#8212;</span>
+      <span class="stat-lbl">Citations</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val" id="stat-year">&#8212;</span>
+      <span class="stat-lbl">Year</span>
+    </div>
+  </div>
+  <hr id="panel-divider">
+  <div id="panel-abstract"></div>
+  <a id="panel-link" href="#" target="_blank">Open on OpenAlex &#x2197;</a>
+</div>
+
+<div id="legend">
+  <div id="legend-title">Publication Year</div>
+  <div id="legend-bar"></div>
+  <div id="legend-labels">
+    <span>__YEAR0__</span><span>__YEAR1__</span>
+  </div>
+</div>
+
+<script>
+var NODE_DATA = __NODE_DATA_JSON__;
+var nodes     = new vis.DataSet(__NODES_JSON__);
+var edges     = new vis.DataSet(__EDGES_JSON__);
+
+var isDark    = false;
+var container = document.getElementById("graph");
+
+var network = new vis.Network(container, {nodes: nodes, edges: edges}, {
+  physics: {
+    enabled: true,
+    solver: "forceAtlas2Based",
+    forceAtlas2Based: {
+      gravitationalConstant: -80,
+      centralGravity: 0.012,
+      springLength: 140,
+      springConstant: 0.06,
+      damping: 0.4,
+      avoidOverlap: 1
+    },
+    stabilization: {enabled: true, iterations: 300, fit: true}
+  },
+  interaction: {
+    hover: true,
+    tooltipDelay: 80,
+    hideEdgesOnDrag: true,
+    navigationButtons: false,
+    keyboard: false,
+    zoomSpeed: 0.7
+  },
+  edges: {color: {inherit: false}, smooth: false},
+  nodes: {scaling: {min: 6, max: 22}}
+});
+
+/* freeze the simulation once it settles so the graph reads as a static,
+   clean diagram rather than a permanently jittering hairball */
+network.once("stabilizationIterationsDone", function() {
+  network.setOptions({physics: {enabled: false}});
+});
+
+/* ── dark / light toggle ── */
+var edgeBase = {};
+edges.get().forEach(function(e) { edgeBase[e.id] = e.color || {}; });
+
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+  document.getElementById("theme-icon").textContent  = isDark ? "☀" : "☾";
+  document.getElementById("theme-label").textContent = isDark ? "Light" : "Dark";
+
+  var boost   = isDark ? 1.8 : 1;
+  var updated = edges.get().map(function(e) {
+    var base = edgeBase[e.id];
+    var m = (base.color || "").match(/rgba\(([0-9]+),([0-9]+),([0-9]+),([0-9.]+)\)/);
+    if (!m) return {id: e.id};
+    var alpha = Math.min(0.9, parseFloat(m[4]) * boost);
+    var color = Object.assign({}, base, {
+      color: "rgba(" + m[1] + "," + m[2] + "," + m[3] + "," + alpha + ")"
+    });
+    edgeBase[e.id] = color;
+    return {id: e.id, color: color};
+  });
+  edges.update(updated);
+}
+
+/* ── hover-to-declutter: dim everything except the hovered paper's
+   direct connections, so a dense web reads clearly on demand ── */
+var allNodeIds = nodes.getIds();
+var allEdgeIds = edges.getIds();
+
+function clearFocus() {
+  nodes.update(allNodeIds.map(function(id) { return {id: id, opacity: 1}; }));
+  edges.update(allEdgeIds.map(function(id) {
+    return {id: id, color: Object.assign({}, edgeBase[id], {opacity: 1})};
+  }));
+}
+
+function focusNode(nodeId) {
+  var connectedNodes = new Set(network.getConnectedNodes(nodeId));
+  connectedNodes.add(nodeId);
+  var connectedEdges = new Set(network.getConnectedEdges(nodeId));
+
+  nodes.update(allNodeIds.map(function(id) {
+    return {id: id, opacity: connectedNodes.has(id) ? 1 : 0.15};
+  }));
+  edges.update(allEdgeIds.map(function(id) {
+    var isConn = connectedEdges.has(id);
+    return {id: id, color: Object.assign({}, edgeBase[id], {opacity: isConn ? 1 : 0.06})};
+  }));
+}
+
+/* ── side panel ── */
+function openPanel(nodeId) {
+  var d = NODE_DATA[nodeId];
+  if (!d) return;
+  document.getElementById("panel-title").textContent    = d.title;
+  document.getElementById("panel-year-tag").textContent = d.year ? String(d.year) : "Year unknown";
+  document.getElementById("stat-year").textContent      = d.year ? String(d.year) : "—";
+  document.getElementById("panel-authors").textContent  =
+    d.authors && d.authors.length ? d.authors.join(", ") : "Authors unknown";
+  document.getElementById("stat-citations").textContent =
+    d.cited_by ? d.cited_by.toLocaleString() : "—";
+  document.getElementById("panel-abstract").textContent = d.abstract || "No abstract available.";
+  document.getElementById("panel-link").href = d.url;
+
+  var badge = document.getElementById("panel-badge");
+  badge.textContent      = d.is_root ? "ROOT PAPER"   : "CITING PAPER";
+  badge.style.background = d.is_root ? "var(--badge-root-bg)" : "var(--badge-cite-bg)";
+  badge.style.color      = d.is_root ? "var(--badge-root-fg)" : "var(--badge-cite-fg)";
+
+  document.getElementById("panel").classList.add("open");
+}
+
+function closePanel() {
+  document.getElementById("panel").classList.remove("open");
+  network.unselectAll();
+}
+
+network.on("click",     function(p) { p.nodes.length ? openPanel(p.nodes[0]) : closePanel(); });
+network.on("hoverNode", function(p) { container.style.cursor = "pointer"; focusNode(p.node); });
+network.on("blurNode",  function()  { container.style.cursor = "default"; clearFocus();      });
+network.on("dragStart", function(p) { if (p.nodes.length) container.style.cursor = "grabbing"; });
+network.on("dragEnd",   function()  { container.style.cursor = "default";  });
+</script>
+</body>
+</html>
